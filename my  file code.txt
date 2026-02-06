@@ -1,0 +1,1058 @@
+craco.config.js   ( my  file code  ) 
+// Load configuration from environment or config file
+const path = require('path');
+
+// Environment variable overrides
+const config = {
+  disableHotReload: process.env.DISABLE_HOT_RELOAD === 'true',
+};
+
+module.exports = {
+  webpack: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+    configure: (webpackConfig) => {
+      
+      // Disable hot reload completely if environment variable is set
+      if (config.disableHotReload) {
+        // Remove hot reload related plugins
+        webpackConfig.plugins = webpackConfig.plugins.filter(plugin => {
+          return !(plugin.constructor.name === 'HotModuleReplacementPlugin');
+        });
+        
+        // Disable watch mode
+        webpackConfig.watch = false;
+        webpackConfig.watchOptions = {
+          ignored: /.*/, // Ignore all files
+        };
+      } else {
+        // Add ignored patterns to reduce watched directories
+        webpackConfig.watchOptions = {
+          ...webpackConfig.watchOptions,
+          ignored: [
+            '**/node_modules/**',
+            '**/.git/**',
+            '**/build/**',
+            '**/dist/**',
+            '**/coverage/**',
+            '**/public/**',
+          ],
+        };
+      }
+      
+      return webpackConfig;
+    },
+  },
+};                               																		( code that you gave to update   Create/update craco.config.js )                           						                                                            const webpack = require('webpack');
+
+module.exports = {
+  webpack: {
+    configure: (webpackConfig) => {
+      // Ensure environment variables are properly defined
+      webpackConfig.plugins.push(
+        new webpack.DefinePlugin({
+          'process.env': JSON.stringify(process.env)
+        })
+      );
+      return webpackConfig;
+    }
+  }
+};                        
+
+   second  (  that  you said me   src/api/config.js)   (  well  i look my  darictry tree if you find   config.js file there   tell me  
+
+// ❌ AVOID THIS - Causes "process is not defined" in browser
+const API_URL = process.env.REACT_APP_API_URL;
+
+// ✅ USE THIS - Safe access with fallback
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+// ✅ EVEN BETTER - Validate and fail early
+const API_URL = (() => {
+  const url = process.env.REACT_APP_API_URL;
+  if (!url) {
+    console.error('REACT_APP_API_URL is not defined in environment');
+    return 'http://localhost:8000'; // fallback for dev
+  }
+  return url;
+})();
+
+export { API_URL }; 
+
+
+third     (  	Create safe API config (src/config/api.config.js):  )      well i am not sure i have this  file or not  look  darictry  tree file   	(  i paste the code that you gave me     
+// Enterprise-grade configuration with validation
+class ApiConfig {
+  constructor() {
+    this.baseURL = this.getBaseURL();
+    this.timeout = this.getTimeout();
+    this.validateConfig();
+  }
+
+  getBaseURL() {
+    // During build, webpack replaces process.env.REACT_APP_API_URL with actual value
+    const url = process.env.REACT_APP_API_URL;
+    
+    if (!url) {
+      console.warn('[API Config] REACT_APP_API_URL not found, using fallback');
+      return 'http://localhost:8000';
+    }
+    
+    return url;
+  }
+
+  getTimeout() {
+    const timeout = process.env.REACT_APP_API_TIMEOUT;
+    return timeout ? parseInt(timeout, 10) : 30000;
+  }
+
+  validateConfig() {
+    console.log('🔧 API Configuration:', {
+      baseURL: this.baseURL,
+      timeout: this.timeout,
+      environment: process.env.NODE_ENV
+    });
+  }
+}
+
+export default new ApiConfig(); 
+
+forth  
+Update your API client (src/api/client.js):   (  look  tree darictry ) 	  (  i paste the code that you gave me
+     
+import axios from 'axios';
+import ApiConfig from '../config/api.config';
+
+const apiClient = axios.create({
+  baseURL: ApiConfig.baseURL,  // ← Using validated config
+  timeout: ApiConfig.timeout,
+  headers: {
+    'Content-Type': 'application/json',
+  }
+});
+
+// Add request interceptor for debugging
+apiClient.interceptors.request.use(
+  (config) => {
+    console.log('📤 API Request:', config.method.toUpperCase(), config.url);
+    return config;
+  },
+  (error) => {
+    console.error('❌ Request Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+fifth    ( App.js )  the  code that i have it  )  
+
+import React, { useState } from 'react';
+import axios from 'axios';
+import ModelViewer from './components/ModelViewer';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
+function App() {
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [modelUrl, setModelUrl] = useState(null);
+    const [uploadStatus, setUploadStatus] = useState('');
+    const [showTestCube, setShowTestCube] = useState(true);
+    const [show3DViewer, setShow3DViewer] = useState(false);
+    
+    // Phase 3: Video Export System
+    const [isRecording, setIsRecording] = useState(false);
+    const [recordingProgress, setRecordingProgress] = useState(0);
+    const mediaRecorderRef = React.useRef(null);
+    const progressIntervalRef = React.useRef(null);
+
+    const handleFileSelect = async (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        setSelectedFile(file);
+        setUploadStatus('Uploading...');
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            console.log('🚀 [App] Uploading file:', file.name);
+            
+            const response = await axios.post(`${API}/upload-model`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            console.log('✅ [App] Upload successful:', response.data);
+            
+            // Construct the model URL
+            const fileUrl = `${BACKEND_URL}/api/${response.data.file_path}`;
+            console.log('🎯 [App] Model URL:', fileUrl);
+            
+            setModelUrl(fileUrl);
+            setShowTestCube(false);
+            setShow3DViewer(true);
+            setUploadStatus(`✅ Uploaded successfully! Loading 3D model...`);
+            
+        } catch (error) {
+            console.error('❌ [App] Upload failed:', error);
+            setUploadStatus(`❌ Upload failed: ${error.response?.data?.detail || error.message}`);
+        }
+    };
+
+    const handleToggleTestCube = () => {
+        setShowTestCube(!showTestCube);
+        setShow3DViewer(true);
+    };
+
+    const handleToggle3DViewer = () => {
+        setShow3DViewer(!show3DViewer);
+    };
+
+    // Phase 3: Video Export System Implementation
+    const startRecording = () => {
+        const canvas = document.querySelector('canvas');
+        if (!canvas) {
+            alert('❌ No 3D canvas found. Please ensure the 3D viewer is active.');
+            return;
+        }
+
+        try {
+            console.log('🎬 [VideoExport] Starting hologram video recording...');
+            
+            // Capture canvas stream at 30 FPS
+            const stream = canvas.captureStream(30);
+            
+            // Configure MediaRecorder with high quality settings
+            const recorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9,opus',
+                videoBitsPerSecond: 2500000 // 2.5 Mbps for good quality
+            });
+
+            const chunks = [];
+            
+            recorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    chunks.push(event.data);
+                }
+            };
+
+            recorder.onstop = () => {
+                console.log('🎬 [VideoExport] Recording completed, creating video blob...');
+                const blob = new Blob(chunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `hologram_${Date.now()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                console.log('✅ Video downloaded:', a.download);
+                setIsRecording(false);
+                setRecordingProgress(0);
+                
+                if (progressIntervalRef.current) {
+                    clearInterval(progressIntervalRef.current);
+                }
+            };
+
+            recorder.onerror = (event) => {
+                console.error('❌ [VideoExport] Recording error:', event.error);
+                setIsRecording(false);
+                setRecordingProgress(0);
+                alert('❌ Recording failed: ' + event.error.message);
+                
+                if (progressIntervalRef.current) {
+                    clearInterval(progressIntervalRef.current);
+                }
+            };
+
+            // Start recording
+            recorder.start();
+            mediaRecorderRef.current = recorder;
+            setIsRecording(true);
+            setRecordingProgress(0);
+
+            // Progress tracking (15 second recording)
+            const recordingDuration = 15000; // 15 seconds
+            const progressUpdateInterval = 100; // Update every 100ms
+            let startTime = Date.now();
+
+            progressIntervalRef.current = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min((elapsed / recordingDuration) * 100, 100);
+                setRecordingProgress(Math.round(progress));
+
+                if (elapsed >= recordingDuration) {
+                    if (mediaRecorderRef.current?.state === 'recording') {
+                        mediaRecorderRef.current.stop();
+                    }
+                    clearInterval(progressIntervalRef.current);
+                }
+            }, progressUpdateInterval);
+
+            console.log('🎬 [VideoExport] Recording started - 15 second hologram video');
+
+        } catch (error) {
+            console.error('❌ [VideoExport] Failed to start recording:', error);
+            alert('❌ Failed to start recording: ' + error.message);
+            setIsRecording(false);
+        }
+    };
+
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+            mediaRecorderRef.current.stop();
+            console.log('🛑 [VideoExport] Recording stopped manually');
+        }
+        
+        if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+        }
+    };
+
+    return (
+        <div style={{ 
+            width: '100vw', 
+            height: '100vh', 
+            backgroundColor: '#222',
+            color: 'white',
+            fontFamily: 'Arial, sans-serif',
+            display: 'flex',
+            flexDirection: 'column'
+        }}>
+            {/* Header Controls */}
+            <div style={{ 
+                padding: '20px',
+                backgroundColor: 'rgba(0,0,0,0.8)',
+                borderBottom: '2px solid #444'
+            }}>
+                <h1 style={{ color: '#00ffff', margin: '0 0 20px 0' }}>
+                    🚀 HoloForge - 3D Model Viewer
+                </h1>
+                
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
+                    <input 
+                        type="file" 
+                        accept=".obj,.fbx,.gltf,.glb,.ply"
+                        onChange={handleFileSelect}
+                        style={{ color: 'white' }}
+                    />
+                    
+                    <button 
+                        onClick={handleToggleTestCube}
+                        style={{
+                            padding: '8px 16px',
+                            backgroundColor: showTestCube ? '#ff4444' : '#0088ff',
+                            color: 'white',
+                            border: 'none',
+                            cursor: 'pointer',
+                            borderRadius: '4px'
+                        }}
+                    >
+                        {showTestCube ? 'Hide Test Cube' : 'Show Test Cube'}
+                    </button>
+                    
+                    <button 
+                        onClick={handleToggle3DViewer}
+                        style={{
+                            padding: '8px 16px',
+                            backgroundColor: show3DViewer ? '#44ff44' : '#666666',
+                            color: 'white',
+                            border: 'none',
+                            cursor: 'pointer',
+                            borderRadius: '4px'
+                        }}
+                    >
+                        {show3DViewer ? '3D Viewer ON' : '3D Viewer OFF'}
+                    </button>
+                    
+                    {/* Phase 3: Video Export Controls */}
+                    <button 
+                        onClick={isRecording ? stopRecording : startRecording}
+                        disabled={!show3DViewer || (!modelUrl && !showTestCube)}
+                        style={{
+                            padding: '12px 24px',
+                            backgroundColor: isRecording ? '#ff4444' : '#00ff00',
+                            color: 'black',
+                            border: 'none',
+                            borderRadius: '4px',
+                            fontSize: '16px',
+                            fontWeight: 'bold',
+                            cursor: (!show3DViewer || (!modelUrl && !showTestCube)) ? 'not-allowed' : 'pointer',
+                            opacity: (!show3DViewer || (!modelUrl && !showTestCube)) ? 0.5 : 1
+                        }}
+                    >
+                        {isRecording ? '🔴 Recording... (' + recordingProgress + '%)' : '📹 Generate Hologram Video (15s)'}
+                    </button>
+                </div>
+
+                {/* File Info */}
+                {selectedFile && (
+                    <div style={{ marginBottom: '10px', fontSize: '14px' }}>
+                        <strong>📁 Selected:</strong> {selectedFile.name} 
+                        <span style={{ color: '#888' }}> ({(selectedFile.size / 1024 / 1024).toFixed(2)} MB)</span>
+                    </div>
+                )}
+
+                {/* Upload Status */}
+                {uploadStatus && (
+                    <div style={{ 
+                        color: uploadStatus.includes('❌') ? '#c8b0b0ff' : '#44ff44',
+                        fontWeight: 'bold',
+                        fontSize: '14px'
+                    }}>
+                        {uploadStatus}
+                    </div>
+                )}
+
+                {/* Phase 3: Recording Progress Indicator */}
+                {isRecording && (
+                    <div style={{ marginTop: '10px' }}>
+                        <div style={{ 
+                            width: '100%', 
+                            height: '6px', 
+                            backgroundColor: '#333',
+                            borderRadius: '3px',
+                            overflow: 'hidden',
+                            border: '1px solid #00ffff'
+                        }}>
+                            <div style={{
+                                width: `${recordingProgress}%`,
+                                height: '100%',
+                                backgroundColor: '#00ff00',
+                                transition: 'width 0.1s ease',
+                                boxShadow: '0 0 10px rgba(0, 255, 0, 0.5)'
+                            }} />
+                        </div>
+                        <p style={{ 
+                            fontSize: '12px', 
+                            color: '#00ffff', 
+                            marginTop: '5px',
+                            textAlign: 'center',
+                            fontWeight: 'bold'
+                        }}>
+                            🎬 Recording hologram video... {recordingProgress}% ({Math.round(recordingProgress * 0.15)}s / 15s)
+                        </p>
+                    </div>
+                )}
+            </div>
+
+            {/* 3D Viewer Area */}
+            <div style={{ flex: 1, position: 'relative' }}>
+                {show3DViewer ? (
+                    <ModelViewer 
+                        modelUrl={modelUrl} 
+                        showTestCube={showTestCube}
+                    />
+                ) : (
+                    <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        height: '100%',
+                        backgroundColor: '#333'
+                    }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <h2 style={{ color: '#00ffff' }}>🎯 3D Model Viewer</h2>
+                            <p>Click "3D Viewer ON" to activate the viewer</p>
+                            <p>Then upload a 3D model or show test cube</p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+export default App;    
+
+export default apiClient;					
+
+( note th ecode that you wanted  to update    )  App.js or main component:
+useEffect(() => {
+  console.log('🔍 Environment Check:', {
+    API_URL: process.env.REACT_APP_API_URL,
+    NODE_ENV: process.env.NODE_ENV,
+    All_Vars: Object.keys(process.env).filter(key => key.startsWith('REACT_APP_'))
+  });
+}, []);
+
+sixth    ( no api.js  file  it need  not no   ) look tree darictry   that  i have in different name   
+
+Solution 1: Backend API Service Fix
+Based on your repo, check this file:
+javascript// frontend/src/services/api.js (or similar)
+
+import axios from 'axios';
+
+// ❌ WRONG - Common mistake
+const API_URL = 'http://localhost:3000';  // This is FRONTEND port!
+
+// ✅ CORRECT - Use environment variable
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
+const apiClient = axios.create({
+    baseURL: API_URL,
+    timeout: 30000,
+    headers: {
+        'Content-Type': 'multipart/form-data'  // Important for file uploads!
+    }
+});
+
+// Upload endpoint
+export const uploadModel = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+        const response = await apiClient.post('/api/upload-model', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Upload failed:', error);
+        throw error;
+    }
+};
+
+
+seventh 
+  ( that  code that you gave me for sever.py  )  
+# backend/server.py (or main.py)
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# ⚠️ CRITICAL: CORS must be configured!
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React dev server
+        "http://127.0.0.1:3000",
+        "http://localhost:80",    # Production
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
+) 
+ # backend/routes/upload.py (or server.py)
+
+from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import JSONResponse
+
+router = APIRouter()
+
+@router.post("/api/upload-model")
+async def upload_model(file: UploadFile = File(...)):
+    """
+    Upload 3D model file
+    
+    Accepts: .glb, .gltf, .obj, .fbx
+    Returns: model_id for processing
+    """
+    
+    # Validate file type
+    allowed_extensions = ['.glb', '.gltf', '.obj', '.fbx']
+    file_ext = os.path.splitext(file.filename)[1].lower()
+    
+    if file_ext not in allowed_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type. Allowed: {', '.join(allowed_extensions)}"
+        )
+    
+    # Save file
+    file_path = f"temp_uploads/{uuid.uuid4()}{file_ext}"
+    
+    with open(file_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+    
+    return JSONResponse({
+        "success": True,
+        "model_id": str(uuid.uuid4()),
+        "filename": file.filename,
+        "path": file_path
+    })
+
+# Register router
+app.include_router(router)
+( note my  server.py )  
+"""
+HoloForge API Server - Production-Grade Backend
+================================================
+Complete, tested, production-ready implementation.
+Works with or without MongoDB.
+"""
+
+from fastapi import FastAPI, APIRouter, File, UploadFile, HTTPException, BackgroundTasks
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from dotenv import load_dotenv
+from starlette.middleware.cors import CORSMiddleware
+from motor.motor_asyncio import AsyncIOMotorClient
+import os
+import logging
+from pathlib import Path
+from pydantic import BaseModel, Field
+from typing import List, Optional
+import uuid
+from datetime import datetime, timezone
+import aiofiles
+import shutil
+import asyncio
+import ffmpeg
+import numpy as np
+from PIL import Image, ImageDraw
+import cv2
+import tempfile
+import trimesh
+import json
+
+
+# Initialize
+ROOT_DIR = Path(__file__).parent
+load_dotenv(ROOT_DIR / '.env')
+
+# Logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# MongoDB Configuration
+mongo_url = os.environ.get('MONGO_URL', '').strip()
+db_name = os.environ.get('DB_NAME', 'holoforge')
+mongodb_required = os.environ.get('MONGODB_REQUIRED', 'false').lower() == 'true'
+
+client = None
+db = None
+mongodb_available = False
+
+if mongo_url:
+    try:
+        logger.info("🔌 Connecting to MongoDB...")
+        client = AsyncIOMotorClient(mongo_url, serverSelectionTimeoutMS=5000)
+        db = client[db_name]
+        mongodb_available = True
+        logger.info(f"✅ MongoDB connected: {db_name}")
+    except Exception as e:
+        logger.error(f"❌ MongoDB failed: {e}")
+        if mongodb_required:
+            raise RuntimeError(f"MongoDB required but failed: {e}")
+        logger.warning("⚠️  Running without MongoDB")
+else:
+    if mongodb_required:
+        raise RuntimeError("MONGO_URL required when MONGODB_REQUIRED=true")
+    logger.info("ℹ️  Running in development mode (no database)")
+
+# In-memory storage
+dev_storage = {
+    "status_checks": [],
+    "model_uploads": [],
+    "video_jobs": []
+}
+
+# FastAPI app
+app = FastAPI(
+    title="HoloForge API",
+    version="1.0.0",
+    docs_url="/api/docs"
+)
+
+api_router = APIRouter(prefix="/api")
+
+# Directories
+UPLOAD_DIR = ROOT_DIR / "uploads"
+UPLOAD_DIR.mkdir(exist_ok=True)
+VIDEO_DIR = ROOT_DIR / "videos"
+VIDEO_DIR.mkdir(exist_ok=True)
+
+app.mount("/api/uploads", StaticFiles(directory=str(UPLOAD_DIR)), name="uploads")
+app.mount("/api/videos", StaticFiles(directory=str(VIDEO_DIR)), name="videos")
+
+# Models
+class VideoJob(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    model_id: str
+    status: str = "pending"
+    progress: int = 0
+    video_path: Optional[str] = None
+    error_message: Optional[str] = None
+    settings: dict = Field(default_factory=dict)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    completed_at: Optional[datetime] = None
+
+class VideoJobCreate(BaseModel):
+    model_id: str
+    settings: Optional[dict] = None
+
+class StatusCheck(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    client_name: str
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class StatusCheckCreate(BaseModel):
+    client_name: str
+
+class ModelUpload(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    filename: str
+    file_path: str
+    file_size: int
+    upload_timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    file_type: str
+    processing_status: str = "uploaded"
+
+class HologramSettings(BaseModel):
+    glow_intensity: float = Field(default=0.8, ge=0.0, le=2.0)
+    scan_speed: float = Field(default=1.0, ge=0.1, le=5.0)
+    flicker_rate: float = Field(default=2.0, ge=0.5, le=10.0)
+
+# Helper functions
+def prepare_for_mongo(data):
+    if isinstance(data, dict):
+        for key, value in data.items():
+            if isinstance(value, datetime):
+                data[key] = value.isoformat()
+    return data
+
+def parse_from_mongo(item):
+    if isinstance(item, dict):
+        for key, value in item.items():
+            if (key.endswith('timestamp') or key.endswith('_at')) and isinstance(value, str):
+                try:
+                    item[key] = datetime.fromisoformat(value)
+                except ValueError:
+                    pass
+    return item
+
+# Routes
+@api_router.get("/")
+async def root():
+    return {
+        "message": "HoloForge API",
+        "version": "1.0.0",
+        "database": "MongoDB" if mongodb_available else "In-Memory",
+        "docs": "/api/docs"
+    }
+
+@api_router.get("/health")
+async def health_check():
+    try:
+        from app.core.dependencies.ffmpeg_manager import ffmpeg_manager
+        ffmpeg_health = ffmpeg_manager.health_check()
+    except Exception as e:
+        ffmpeg_health = {"status": "critical", "error": str(e)}
+    
+    return {
+        "status": "healthy",
+        "service": "HoloForge API",
+        "version": "1.0.0",
+        "dependencies": {
+            "ffmpeg": ffmpeg_health,
+            "database": {
+                "type": "MongoDB" if mongodb_available else "In-Memory",
+                "status": "connected" if mongodb_available else "disabled"
+            }
+        }
+    }
+
+@api_router.post("/status", response_model=StatusCheck)
+async def create_status_check(input: StatusCheckCreate):
+    status_obj = StatusCheck(**input.dict())
+    
+    if mongodb_available:
+        await db.status_checks.insert_one(prepare_for_mongo(status_obj.dict()))
+    else:
+        dev_storage["status_checks"].append(status_obj.dict())
+    
+    return status_obj
+
+@api_router.get("/status", response_model=List[StatusCheck])
+async def get_status_checks():
+    if mongodb_available:
+        checks = await db.status_checks.find().to_list(1000)
+        return [StatusCheck(**parse_from_mongo(c)) for c in checks]
+    else:
+        return [StatusCheck(**c) for c in dev_storage["status_checks"]]
+
+@api_router.post("/upload-model", response_model=ModelUpload)
+async def upload_3d_model(file: UploadFile = File(...)):
+    allowed = {'.obj', '.fbx', '.gltf', '.glb', '.ply'}
+    ext = Path(file.filename).suffix.lower()
+    
+    if ext not in allowed:
+        raise HTTPException(400, f"Unsupported type. Allowed: {', '.join(allowed)}")
+    
+    content = await file.read()
+    if len(content) > 50 * 1024 * 1024:
+        raise HTTPException(400, "File too large (max 50MB)")
+    
+    file_id = str(uuid.uuid4())
+    safe_name = f"{file_id}_{file.filename}"
+    file_path = UPLOAD_DIR / safe_name
+    
+    async with aiofiles.open(file_path, 'wb') as f:
+        await f.write(content)
+    
+    model = ModelUpload(
+        id=file_id,
+        filename=file.filename,
+        file_path=str(file_path.relative_to(ROOT_DIR)),
+        file_size=len(content),
+        file_type=ext,
+        processing_status="uploaded"
+    )
+    
+    if mongodb_available:
+        await db.model_uploads.insert_one(prepare_for_mongo(model.dict()))
+    else:
+        dev_storage["model_uploads"].append(model.dict())
+    
+    return model
+
+@api_router.get("/models", response_model=List[ModelUpload])
+async def get_uploaded_models():
+    if mongodb_available:
+        models = await db.model_uploads.find().to_list(100)
+        return [ModelUpload(**parse_from_mongo(m)) for m in models]
+    else:
+        return [ModelUpload(**m) for m in dev_storage["model_uploads"]]
+
+@api_router.get("/model/{model_id}", response_model=ModelUpload)
+async def get_model(model_id: str):
+    if mongodb_available:
+        model = await db.model_uploads.find_one({"id": model_id})
+        if not model:
+            raise HTTPException(404, "Model not found")
+        return ModelUpload(**parse_from_mongo(model))
+    else:
+        for m in dev_storage["model_uploads"]:
+            if m["id"] == model_id:
+                return ModelUpload(**m)
+        raise HTTPException(404, "Model not found")
+
+@api_router.delete("/model/{model_id}")
+async def delete_model(model_id: str):
+    if mongodb_available:
+        model = await db.model_uploads.find_one({"id": model_id})
+        if not model:
+            raise HTTPException(404, "Model not found")
+        file_path = ROOT_DIR / model["file_path"]
+        if file_path.exists():
+            file_path.unlink()
+        await db.model_uploads.delete_one({"id": model_id})
+    else:
+        model = next((m for m in dev_storage["model_uploads"] if m["id"] == model_id), None)
+        if not model:
+            raise HTTPException(404, "Model not found")
+        file_path = ROOT_DIR / model["file_path"]
+        if file_path.exists():
+            file_path.unlink()
+        dev_storage["model_uploads"] = [m for m in dev_storage["model_uploads"] if m["id"] != model_id]
+    
+    return {"message": "Model deleted successfully"}
+
+# Include router
+app.include_router(api_router)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_credentials=True,
+    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Startup
+@app.on_event("startup")
+async def startup_event():
+    logger.info("=" * 70)
+    logger.info("🚀 HoloForge API Starting...")
+    logger.info("=" * 70)
+    
+    if mongodb_available:
+        logger.info(f"✅ Database: MongoDB ({db_name})")
+    else:
+        logger.info("ℹ️  Database: In-Memory (dev mode)")
+    
+    try:
+        from app.core.dependencies.ffmpeg_manager import ffmpeg_manager
+        health = ffmpeg_manager.health_check()
+        if health['status'] == 'critical':
+            logger.error("❌ FFmpeg not available!")
+        else:
+            logger.info(f"✅ FFmpeg: {health['version']}")
+    except:
+        logger.warning("⚠️  FFmpeg check skipped")
+    
+    logger.info("=" * 70)
+    logger.info("✅ HoloForge API Ready!")
+    logger.info("📖 Docs: http://localhost:8000/api/docs")
+    logger.info("=" * 70)
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    if client:
+        client.close()
+    logger.info("✅ Shutdown complete")
+
+
+eighth   (  here that code that you gav eme for     croco.congig.js 
+
+// frontend/craco.config.js
+const path = require('path');
+
+module.exports = {
+  webpack: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+      '@components': path.resolve(__dirname, 'src/components'),
+      '@services': path.resolve(__dirname, 'src/services'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
+    },
+    configure: (webpackConfig) => {
+      // Optimize watch options (reduce CPU usage)
+      webpackConfig.watchOptions = {
+        ignored: [
+          '**/node_modules/**',
+          '**/.git/**',
+          '**/build/**',
+          '**/public/**',
+          '**/.env*',
+        ],
+        poll: false,  // Disable polling (use native file watching)
+        aggregateTimeout: 300,  // Delay rebuild after changes
+      };
+      
+      // Improve development build performance
+      if (process.env.NODE_ENV === 'development') {
+        webpackConfig.optimization = {
+          ...webpackConfig.optimization,
+          removeAvailableModules: false,
+          removeEmptyChunks: false,
+          splitChunks: false,
+        };
+      }
+      
+      return webpackConfig;
+    },
+  },
+  
+  // Development server configuration
+  devServer: (devServerConfig) => {
+    return {
+      ...devServerConfig,
+      // Proxy API requests to backend (ALTERNATIVE TO CORS)
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+          pathRewrite: {
+            '^/api': '/api',  // Keep /api prefix
+          },
+        },
+      },
+    };
+  },
+};
+
+
+file  that  i have for  craco.config.js  
+
+// Load configuration from environment or config file
+const path = require('path');
+
+// Environment variable overrides
+const config = {
+  disableHotReload: process.env.DISABLE_HOT_RELOAD === 'true',
+};
+
+module.exports = {
+  webpack: {
+    alias: {
+      '@': path.resolve(__dirname, 'src'),
+    },
+    configure: (webpackConfig) => {
+      
+      // Disable hot reload completely if environment variable is set
+      if (config.disableHotReload) {
+        // Remove hot reload related plugins
+        webpackConfig.plugins = webpackConfig.plugins.filter(plugin => {
+          return !(plugin.constructor.name === 'HotModuleReplacementPlugin');
+        });
+        
+        // Disable watch mode
+        webpackConfig.watch = false;
+        webpackConfig.watchOptions = {
+          ignored: /.*/, // Ignore all files
+        };
+      } else {
+        // Add ignored patterns to reduce watched directories
+        webpackConfig.watchOptions = {
+          ...webpackConfig.watchOptions,
+          ignored: [
+            '**/node_modules/**',
+            '**/.git/**',
+            '**/build/**',
+            '**/dist/**',
+            '**/coverage/**',
+            '**/public/**',
+          ],
+        };
+      }
+      
+      return webpackConfig;
+    },
+  },
+};  
+
+
+
+
+
+"'const repoVerification = {
+    expectedFiles: {
+        "frontend/src/components/": [
+            "ModelUploader.jsx",
+            "HologramViewer.jsx", 
+            "CameraControls.jsx",
+            "ExportPanel.jsx",
+            "ModelList.jsx"
+        ],
+        "frontend/src/services/": [
+            "UploadService.js",
+            "ExportService.js"
+        ],
+        "frontend/src/hooks/": [
+            "useUpload.js",
+            "useExport.js",
+            "useHologramShader.js"
+        ]
+    },
+    
+    toVerify: {
+        question1: "Do these files exist in your repo?",
+        question2: "Are you on the correct branch (main/master)?",
+        question3: "Did you run 'npm start' or 'npm run build'?",
+        question4: "Is frontend/build/ folder up to date?"
+    }
+};
+

@@ -1,0 +1,445 @@
+WHAT LIKELY HAPPENED (Senior Dev Analysis)   
+const likelyScenarios = {
+    scenario1_mostLikely: {
+        name: "Running Placeholder Version",
+        explanation: "You're viewing an early prototype/skeleton",
+        evidence: "Buttons say 'Show Test Cube' (debug feature)",
+        solution: "Check if there's a 'viewer' or 'main' branch with real code",
+        probability: "80%"
+    },
+    
+    scenario2: {
+        name: "React Components Not Built",
+        explanation: "Source code exists but not compiled/bundled",
+        evidence: "Basic HTML showing instead of React app",
+        solution: "Run 'npm install' + 'npm start' properly",
+        probability: "15%"
+    },
+    
+    scenario3: {
+        name: "Day 5 Work Not Committed",
+        explanation: "You did frontend work but never pushed to GitHub",
+        evidence: "GitHub docs mention features you don't see",
+        solution: "Check local changes with 'git status'",
+        probability: "5%"
+    }
+};    
+ priorityCheck: {
+        question1: "Do files like 'HologramViewer.jsx' exist in your repo?",
+        question2: "When you search GitHub repo for 'Three.js', what do you find?",
+        question3: "What does 'git log' show for recent frontend work?"
+
+const criticalQuestion = {
+    ask_yourself: "Did I ever actually BUILD the full frontend?",
+    
+    scenarios: {
+        yes: {
+            then: "Where is it? (Different branch? Local only?)",
+            action: "Find it, commit it, run it"
+        },
+        
+        no: {
+            then: "The docs describe what SHOULD exist, not what DOES exist",
+            action: "You need to build it from the documentation"
+        },
+        
+        unsure: {
+            then: "Check git history and file structure",
+            action: "Verify what code actually exists"
+        }
+    }
+};   
+
+logs   terminal 
+ Microsoft Windows [Version 10.0.26200.7171]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\nope\Desktop\holoforege\holoforge1>cd C:\Users\nope\Desktop\holoforege\holoforge1\frontend
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>git branch
+* main
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>git status
+Refresh index: 100% (169/169), done.
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   ../backend/requirements.txt
+        modified:   ../backend/server.py
+        modified:   package.json
+        modified:   public/index.html
+        modified:   src/App.js
+        modified:   src/index.js
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+        ../backend/# === PRODUCTION-LOCKED DEPENDENCIES ===.txt
+        ../backend/(c)
+        ../backend/File
+        ../backend/IndentationError
+        ../backend/Microsoft
+        ../backend/cd
+        ../backend/models
+        ../backend/py
+        ../backend/uploads/0b119af8-2c1b-40d0-b84e-01647bab2e1b_Oth51_FD_24.glb
+        ../backend/uploads/24372728-8258-4951-9120-60ddf399e258_Oth51_FD_24.glb
+        ../backend/uploads/e3df146e-4c79-437e-9572-66b87d679833_Oth51_FD_24.glb
+        ../backend/uploads/fc39c2d6-dc2d-4b6c-b3b6-32a7c73df06c_Oth51_FD_24.glb
+        ../backend/verify_setup.py
+        ../cd
+        package-lock.json
+        src/components/ModelUploader.js
+        src/hooks/useUpload.js
+        src/services/UploadService.js
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>git log --oneline -10
+9633b18 (HEAD -> main, origin/main, origin/HEAD) holoforge complete document
+7315d1b Auto-generated changes
+6e3d0f1 auto-commit for 11c6d800-8f28-4b2a-af7c-61f2572209c2
+4874f68 auto-commit for 6f3ae7b7-0539-4a60-a4db-1d1565e077da
+28e8f05 auto-commit for 9050e5ea-9202-4d28-bd3a-5b380cdaa23c
+1073938 auto-commit for 1f971c94-c4eb-4b71-8c0f-8b19d94986d3
+2a9f77d auto-commit for 761481d4-2dcb-45d4-8dae-821902230261
+fabeb1b auto-commit for dd53f712-70cd-42e4-9ec4-89d34875391d
+a389c5b auto-commit for 372f5a0a-b15a-4dae-85fd-ce069679d579
+aee9096 auto-commit for 952a9b7a-749a-4efd-9e58-5b14408c2c45
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>dir /s /b | findstr /i "Viewer\|Uploader\|Export"
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>cd holoforge1
+The system cannot find the path specified.
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>cd C:\Users\nope\Desktop\holoforege\holoforge1
+
+C:\Users\nope\Desktop\holoforege\holoforge1>dir /s /b | findstr /i "Viewer\|Uploader\|Export"
+
+C:\Users\nope\Desktop\holoforege\holoforge1>git log
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+...skipping...
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+...skipping...
+
+                   SUMMARY OF LESS COMMANDS
+
+      Commands marked with * may be preceded by a number, N.
+      Notes in parentheses indicate the behavior if N is given.
+      A key preceded by a caret indicates the Ctrl key; thus ^K is ctrl-K.
+
+  h  H                 Display this help.
+  q  :q  Q  :Q  ZZ     Exit.
+ ---------------------------------------------------------------------------
+
+                           MOVING
+
+  e  ^E  j  ^N  CR  *  Forward  one line   (or N lines).
+  y  ^Y  k  ^K  ^P  *  Backward one line   (or N lines).
+  ESC-j             *  Forward  one file line (or N file lines).
+  ESC-k             *  Backward one file line (or N file lines).
+  f  ^F  ^V  SPACE  *  Forward  one window (or N lines).
+HELP -- Press RETURN for more, or q when done...skipping...
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+:
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+:
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+:
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+:
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+:
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+:
+commit 9633b188aee2b0c3ef8dbe25ae18655034efaa8a (HEAD -> main, origin/main, origin/HEAD)
+Author: DEARDETEX <90949919+DEARDETEX@users.noreply.github.com>
+Date:   Thu Dec 4 06:10:29 2025 +0530
+
+    holoforge complete document
+
+     this  document content all the new     information  about are  project    always  refer this first   its have all the  letest information regarding  are project
+
+commit 7315d1b622aaa5ff8678b8c1298a96bdb37139d7
+Author: emergent-agent-e1 <github@emergent.sh>
+Date:   Mon Dec 1 16:52:06 2025 +0000
+
+    Auto-generated changes
+
+commit 6e3d0f145f4f5b2297645112cea172a066842f08
+:
+
+
+Microsoft Windows [Version 10.0.26200.7171]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\nope\Desktop\holoforege\holoforge1>cd backend
+
+C:\Users\nope\Desktop\holoforege\holoforge1\backend>git branch
+* main
+
+C:\Users\nope\Desktop\holoforege\holoforge1\backend>dir /s /b src\components
+The system cannot find the file specified.
+
+C:\Users\nope\Desktop\holoforege\holoforge1\backend>findstr /s /i "three" src\*.js src\*.jsx
+
+C:\Users\nope\Desktop\holoforege\holoforge1\backend>type package.json | findstr "three"
+The system cannot find the file specified.
+
+C:\Users\nope\Desktop\holoforege\holoforge1\backend>cd holoforge1
+The system cannot find the path specified.
+
+C:\Users\nope\Desktop\holoforege\holoforge1\backend>cd frontend
+The system cannot find the path specified.
+
+C:\Users\nope\Desktop\holoforege\holoforge1\backend> cd C:\Users\nope\Desktop\holoforege\holoforge1\frontend
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>dir /s /b src\components
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\export
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ModelUploader.js
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ModelViewer.js
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ModelViewer.js.backup
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\export\ExportPanel.css
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\export\ExportPanel.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\export\ExportProgressDialog.css
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\export\ExportProgressDialog.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\accordion.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\alert-dialog.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\alert.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\aspect-ratio.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\avatar.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\badge.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\breadcrumb.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\button.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\calendar.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\card.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\carousel.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\checkbox.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\collapsible.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\command.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\context-menu.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\dialog.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\drawer.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\dropdown-menu.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\form.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\hover-card.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\input-otp.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\input.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\label.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\menubar.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\navigation-menu.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\pagination.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\popover.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\progress.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\radio-group.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\resizable.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\scroll-area.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\select.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\separator.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\sheet.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\skeleton.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\slider.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\sonner.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\switch.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\table.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\tabs.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\textarea.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\toast.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\toaster.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\toggle-group.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\toggle.jsx
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend\src\components\ui\tooltip.jsx
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>findstr /s /i "three" src\*.js src\*.jsx
+src\components\ModelViewer.js:import { Canvas, useFrame, useThree } from '@react-three/fiber';
+src\components\ModelViewer.js:import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+src\components\ModelViewer.js:import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+src\components\ModelViewer.js:import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils';
+src\components\ModelViewer.js:import * as THREE from 'three';
+src\components\ModelViewer.js:    const box = new THREE.Box3().setFromObject(mesh);
+src\components\ModelViewer.js:    const center = box.getCenter(new THREE.Vector3());
+src\components\ModelViewer.js:    const size = box.getSize(new THREE.Vector3());
+src\components\ModelViewer.js:    const scaledBox = new THREE.Box3().setFromObject(mesh);
+src\components\ModelViewer.js:    const scaledCenter = scaledBox.getCenter(new THREE.Vector3());
+src\components\ModelViewer.js:    const { camera } = useThree();
+src\components\ModelViewer.js:                    const hologramMesh = new THREE.Mesh(mergedGeometry, hologramMaterial);
+src\components\ModelViewer.js:                    const hologramMesh = new THREE.Mesh(mergedGeometry, hologramMaterial);
+src\components\ModelViewer.js:// Test cube for debugging Three.js rendering with hologram effects
+src\components\ModelViewer.js:    return new THREE.ShaderMaterial({
+src\components\ModelViewer.js:            color: { value: new THREE.Color(0x00ffff) },
+src\components\ModelViewer.js:        blending: THREE.AdditiveBlending,
+src\components\ModelViewer.js:        side: THREE.DoubleSide
+src\core\loaders\GLBLoaderPlugin.js:import * as THREE from 'three';
+src\core\loaders\GLBLoaderPlugin.js:import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+src\core\loaders\GLBLoaderPlugin.js:import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils';
+src\core\loaders\GLBLoaderPlugin.js:        // Three.js loader instance
+src\core\loaders\GLBLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>}
+src\core\loaders\GLBLoaderPlugin.js:     * @param {THREE.Object3D} scene
+src\core\loaders\GLBLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>}
+src\core\loaders\GLBLoaderPlugin.js:            const container = new THREE.Group();
+src\core\loaders\GLBLoaderPlugin.js:     * @param {THREE.Object3D} object
+src\core\loaders\GLBLoaderPlugin.js:     * @returns {Array<THREE.Mesh>}
+src\core\loaders\GLBLoaderPlugin.js:     * @param {Array<THREE.Mesh>} meshes
+src\core\loaders\GLBLoaderPlugin.js:     * @returns {THREE.Mesh}
+src\core\loaders\GLBLoaderPlugin.js:            const mergedMesh = new THREE.Mesh(
+src\core\loaders\GLBLoaderPlugin.js:                new THREE.MeshStandardMaterial() // Placeholder
+src\core\loaders\OBJLoaderPlugin.js:import * as THREE from 'three';
+src\core\loaders\OBJLoaderPlugin.js:import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+src\core\loaders\OBJLoaderPlugin.js:import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils';
+src\core\loaders\OBJLoaderPlugin.js:        // Three.js loader instance
+src\core\loaders\OBJLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>}
+src\core\loaders\OBJLoaderPlugin.js:     * @param {THREE.Object3D} object
+src\core\loaders\OBJLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>}
+src\core\loaders\OBJLoaderPlugin.js:            const container = new THREE.Group();
+src\core\loaders\OBJLoaderPlugin.js:     * @param {THREE.Object3D} object
+src\core\loaders\OBJLoaderPlugin.js:     * @returns {Array<THREE.Mesh>}
+src\core\loaders\OBJLoaderPlugin.js:     * @param {Array<THREE.Mesh>} meshes
+src\core\loaders\OBJLoaderPlugin.js:     * @returns {THREE.Mesh}
+src\core\loaders\OBJLoaderPlugin.js:            const mergedMesh = new THREE.Mesh(
+src\core\loaders\OBJLoaderPlugin.js:                new THREE.MeshStandardMaterial()
+src\core\plugins\ModelLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>} - Loaded scene
+src\core\plugins\ModelLoaderPlugin.js:     * @param {THREE.Object3D} scene - Loaded scene
+src\core\plugins\ModelLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>} - Processed scene
+src\core\plugins\UniversalModelLoader.js:     * @returns {Promise<THREE.Object3D>}
+
+src\core\plugins\ModelLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>} - Loaded scene
+src\core\plugins\ModelLoaderPlugin.js:     * @param {THREE.Object3D} scene - Loaded scene
+src\core\plugins\ModelLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>} - Processed scene
+src\core\plugins\UniversalModelLoader.js:     * @returns {Promise<THREE.Object3D>}
+
+src\core\plugins\ModelLoaderPlugin.js:     * @param {THREE.Object3D} scene - Loaded scene
+src\core\plugins\ModelLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>} - Processed scene
+src\core\plugins\UniversalModelLoader.js:     * @returns {Promise<THREE.Object3D>}
+
+src\core\plugins\ModelLoaderPlugin.js:     * @returns {Promise<THREE.Object3D>} - Processed scene
+src\core\plugins\UniversalModelLoader.js:     * @returns {Promise<THREE.Object3D>}
+
+src\core\plugins\UniversalModelLoader.js:     * @returns {Promise<THREE.Object3D>}
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>type package.json | findstr "three"
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>type package.json | findstr "three"
+    "@react-three/drei": "^9.109.5",
+    "@react-three/fiber": "^8.17.5",
+    "three": "^0.180.0",
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>netstat -ano | findstr :3000
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>git branch -v
+* main 9633b18 holoforge complete document
+
+C:\Users\nope\Desktop\holoforege\holoforge1\frontend>
